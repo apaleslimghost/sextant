@@ -25,6 +25,17 @@ export default ({ }) => <Canvas draw={(ctx, canvas) => {
 	const image = new ImageData(data, width, height)
 	ctx.putImageData(image, 0, 0)
 
+	ctx.globalCompositeOperation = 'multiply'
+	const round = ctx.createRadialGradient(200, 200, 0, 200, 200, 200)
+	round.addColorStop(0, 'white')
+	round.addColorStop(0.8, 'white')
+	round.addColorStop(1, 'black')
+
+	ctx.fillStyle = round
+	ctx.fillRect(0, 0, width, height)
+
+	ctx.globalCompositeOperation = 'source-over'
+
 	gradientMap(canvas, {
 		0: 'blue',
 		0.5: 'blue',
