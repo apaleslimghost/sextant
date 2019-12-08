@@ -3,17 +3,34 @@ import Canvas from './canvas'
 import { Simplex2 } from 'tumult'
 import gradientMap from './gradientmap'
 
-export default ({ }) => <Canvas draw={(ctx, canvas) => {
-	const noise = new Simplex2('seed')
+const clamp = x => Math.min(1, Math.max(0, x))
+
+const types = {
+	island(x, y, g) {
+		return (1 - (((x - 200) / 200) ** 2 + ((y - 200) / 200) ** 2) ** 2) * g
+	},
+
+	coast(x, y, g) {
+		return clamp(g * y / 300 + y / 1600)
+	},
+
+	smallIslands(x, y, g) {
+		const edgeFade = clamp(x / 50) * clamp((400 - x) / 50) * clamp(y / 50) * clamp((400 - y) / 50)
+		return g ** 1.5 * edgeFade
+	}
+}
+
+export default ({ type, scale = 4 }) => <Canvas draw={(ctx, canvas) => {
 	const { width, height } = canvas
+	const noise = new Simplex2('seed')
 
 	const data = new Uint8ClampedArray(width * height * 4)
 
 	for (let y = 0; y < height; y++) {
 		for (let x = 0; x < width; x++) {
 			const i = (x + y * width) * 4
-			const n = noise.octavate(5, x / 100, y / 100)
-			const g = (128 + Math.floor(128 * n))
+			const n = (noise.octavate(scale, x / 100, y / 100) + 1) / 2
+			const g = Math.floor(256 * types[type](x, y, n))
 
 			data[i] = g
 			data[i + 1] = g
@@ -25,24 +42,13 @@ export default ({ }) => <Canvas draw={(ctx, canvas) => {
 	const image = new ImageData(data, width, height)
 	ctx.putImageData(image, 0, 0)
 
-	ctx.globalCompositeOperation = 'multiply'
-	const round = ctx.createRadialGradient(200, 200, 0, 200, 200, 200)
-	round.addColorStop(0, 'white')
-	round.addColorStop(0.8, 'white')
-	round.addColorStop(1, 'black')
-
-	ctx.fillStyle = round
-	ctx.fillRect(0, 0, width, height)
-
-	ctx.globalCompositeOperation = 'source-over'
-
 	gradientMap(canvas, {
 		0: '#fff1e5',
 		0.49: '#fff1e5',
-		0.491: '#ccc1b7',
-		0.5: '#ccc1b7',
-		0.509: '#ccc1b7',
+		0.491: '#999189',
+		0.5: '#999189',
+		0.509: '#999189',
 		0.51: '#f2dfce',
-		1: '#f2dfce',
+		1: '#fffcfa',
 	})
 }} width={400} height={400} />
