@@ -37,10 +37,12 @@ export default ({ }) => <Canvas draw={(ctx, canvas) => {
 	ctx.globalCompositeOperation = 'source-over'
 
 	gradientMap(canvas, {
-		0: 'blue',
-		0.5: 'blue',
-		0.51: 'black',
-		0.52: 'green',
-		1: 'green',
+		0: '#fff1e5',
+		0.49: '#fff1e5',
+		0.491: '#ccc1b7',
+		0.5: '#ccc1b7',
+		0.509: '#ccc1b7',
+		0.51: '#f2dfce',
+		1: '#f2dfce',
 	})
 }} width={400} height={400} />
