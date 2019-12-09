@@ -33,7 +33,6 @@ const omens = [
 	'the seas look calmer',
 	'thunderclouds gather',
 	'a silhouette on the horizon',
-
 ]
 
 const getRandom = (noise, array, x, y, scale, weight = 2) => {
