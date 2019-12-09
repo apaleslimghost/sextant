@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo } from 'react'
-import { Simplex2 } from 'tumult'
+import Simplex2 from './noise/simplex2'
 
 export const Seed = createContext()
 

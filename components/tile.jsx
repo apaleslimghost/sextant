@@ -43,8 +43,8 @@ export default React.memo(({ x: mapX, y: mapY, type, scale = 4, ...props }) => {
 				const i = (x + y * width) * 4
 				const n = (noise.octavate(
 					scale,
-					(x + mapX * width) / (width / 2.5),
-					(y + mapY * height) / (height / 2.5)
+					((x + mapX * width)) / (width / 2.5),
+					((y + mapY * height)) / (height / 2.5)
 				) + 1) / 2
 				const g = Math.floor(256 * types[type](x, y, n, width, height))
 
