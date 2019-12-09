@@ -29,14 +29,14 @@ const verbs = {
 const adjectives = ['rocky', 'bare', 'barren', 'jagged', 'rugged', 'irregular', 'craggy', 'bitter', 'bleak', 'desolate', 'windswept', 'foreboding', 'icy', 'frozen']
 
 const getRandom = (noise, array, x, y, scale, weight = 2) => {
-	const n = (noise.gen((x % scale) / scale, (y % scale) / scale) + 1) / 2
+	const n = (noise.gen(x / scale, y / scale) + 1) / 2
 	const g = Math.floor(n ** weight * array.length)
 	return array[g]
 }
 
 const getRandomByPos = (noise, array) => (x, y) => {
 	const range = array[Math.min(array.length - 1, y)]
-	return getRandom(noise, range, x, y, 5, 1.5)
+	return getRandom(noise, range, x, y, 5, 2)
 }
 
 const Description = ({ type, x, y }) => {
