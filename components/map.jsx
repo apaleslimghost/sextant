@@ -135,8 +135,61 @@ export default ({ width, height }) => {
 							width={width}
 							height={height}
 						/>
-						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: 1, left: 0, top: 0, boxShadow: shadows.join(', ') }} />
-						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: -1, left: 0, top: 0, boxShadow: '0 0 50px 50px #fff1e5' }} />
+						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: 1, left: 0, top: 0, boxShadow: shadows.join(', '), pointerEvents: 'none' }} />
+						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: -1, left: 0, top: 0, boxShadow: '0 0 50px 50px #fff1e5', pointerEvents: 'none' }} />
+						{location.hash !== '#display' && pos(...current) === pos(x, y) &&
+							<div style={{ position: 'absolute', width: '100%', height: '100%', left: 0, top: 0, zIndex: 3 }}>
+								<button
+									type='button'
+									disabled={current[0] === 0}
+									onClick={() => {
+										const [x, y] = current
+										const next = [x - 1, y]
+										setCurrent(next)
+										setDiscovered(d => d.concat([next]))
+									}}
+									style={{ position: 'absolute', right: '100%', top: '50%', width: '2em', height: '2em', padding: 0, textAlign: 'center', marginTop: '-1em' }}
+								>
+									←
+				</button>
+								<button
+									type='button'
+									onClick={() => {
+										const [x, y] = current
+										const next = [x + 1, y]
+										setCurrent(next)
+										setDiscovered(d => d.concat([next]))
+									}}
+									style={{ position: 'absolute', left: '100%', top: '50%', width: '2em', height: '2em', padding: 0, textAlign: 'center', marginTop: '-1em' }}
+								>
+									→
+				</button>
+								<button
+									type='button'
+									onClick={() => {
+										const [x, y] = current
+										const next = [x, y + 1]
+										setCurrent(next)
+										setDiscovered(d => d.concat([next]))
+									}}
+									style={{ position: 'absolute', bottom: '100%', left: '50%', width: '2em', height: '2em', padding: 0, textAlign: 'center', marginLeft: '-1em' }}
+								>
+									↑
+				</button>
+								<button
+									type='button'
+									disabled={current[1] === 0}
+									onClick={() => {
+										const [x, y] = current
+										const next = [x, y - 1]
+										setCurrent(next)
+										setDiscovered(d => d.concat([next]))
+									}}
+									style={{ position: 'absolute', top: '100%', left: '50%', width: '2em', height: '2em', padding: 0, textAlign: 'center', marginLeft: '-1em' }}
+								>
+									↓
+				</button></div>
+						}
 					</div>
 				})}
 			</div>
@@ -145,54 +198,10 @@ export default ({ width, height }) => {
 				<Log discovered={discovered} />
 			</div>
 
-			{location.hash !== '#display' &&
+
+			{
+				location.hash !== '#display' &&
 				<div style={{ position: 'fixed', right: 0, zIndex: 2 }}>
-					<button
-						type='button'
-						disabled={current[0] === 0}
-						onClick={() => {
-							const [x, y] = current
-							const next = [x - 1, y]
-							setCurrent(next)
-							setDiscovered(d => d.concat([next]))
-						}}
-					>
-						←
-				</button>
-					<button
-						type='button'
-						onClick={() => {
-							const [x, y] = current
-							const next = [x + 1, y]
-							setCurrent(next)
-							setDiscovered(d => d.concat([next]))
-						}}
-					>
-						→
-				</button>
-					<button
-						type='button'
-						onClick={() => {
-							const [x, y] = current
-							const next = [x, y + 1]
-							setCurrent(next)
-							setDiscovered(d => d.concat([next]))
-						}}
-					>
-						↑
-				</button>
-					<button
-						type='button'
-						disabled={current[1] === 0}
-						onClick={() => {
-							const [x, y] = current
-							const next = [x, y - 1]
-							setCurrent(next)
-							setDiscovered(d => d.concat([next]))
-						}}
-					>
-						↓
-				</button>
 					<button
 						type='button'
 						onClick={() => {
@@ -205,7 +214,8 @@ export default ({ width, height }) => {
 					>
 						⎋
 				</button>
-				</div>}
+				</div>
+			}
 		</>
 	)
 }
