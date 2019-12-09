@@ -36,7 +36,7 @@ const getRandom = (noise, array, x, y, scale, weight = 2) => {
 
 const getRandomByPos = (noise, array) => (x, y) => {
 	const range = array[Math.min(array.length - 1, y)]
-	return getRandom(noise, range, x, y, 5)
+	return getRandom(noise, range, x, y, 5, 1.5)
 }
 
 const Description = ({ type, x, y }) => {
@@ -52,28 +52,53 @@ const Log = ({ discovered }) => {
 	const noise = useNoise()
 	const getType = getRandomByPos(noise, types)
 	return <ul>{discovered.slice(-5).map(([x, y], i) => <li key={i}>
-		Day {Math.ceil(7 * (i + Math.max(0, discovered.length - 5)) * ((noise.gen(x / 50, y / 50) + 2) / 2))}. <Description {...{ x, y }} type={getType(x, y)} />
+		Day {Math.ceil(3 * (i + Math.max(0, discovered.length - 5)) * ((noise.gen(x / 50, y / 50) + 2) / 2))}. <Description {...{ x, y }} type={getType(x, y)} />
 	</li>)}</ul>
+}
+
+const posCache = new Map()
+const pos = (x, y) => {
+	if (posCache.has(`${x},${y}`)) {
+		return posCache.get(`${x},${y}`)
+	}
+
+	const pos = [x, y]
+	posCache.set(`${x},${y}`, pos)
+	return pos
 }
 
 export default ({ width, height }) => {
 	const seed = useContext(Seed)
-	const [current, setCurrent] = useLocalStorage(`sextant_${seed}_current`, [0, 0])
+	const [current, setCurrent] = useLocalStorage(`sextant_${seed}_current`, pos(0, 0))
 	const [discovered, setDiscovered] = useLocalStorage(`sextant_${seed}_discovered`, [
-		[0, 0],
+		pos(0, 0),
 	])
 	const noise = useNoise()
 
 	const maxY = Math.max(...discovered.map(([, y]) => y))
 	const getType = getRandomByPos(noise, types)
 
-	const uniqDiscovered = Array.from(new Set(discovered.map(([x, y]) => `${x},${y}`)), s => s.split(','))
+	const uniqDisco = Array.from(new Set(discovered.map(([x, y]) => pos(x, y))))
 
 	return (
 		<>
 			<div style={{ position: 'absolute', height: `${(maxY + 1) * height}px`, minHeight: 'calc(100vh - 2em)', left: 0, top: '2em' }}>
-				{uniqDiscovered.map(([x, y]) => (
-					<div
+				{uniqDisco.map(([x, y]) => {
+					const unexplored = {
+						n: !discovered.some(([dx, dy]) => dx === x && dy === y + 1),
+						e: !discovered.some(([dx, dy]) => dx === x + 1 && dy === y),
+						s: !discovered.some(([dx, dy]) => y === 0 || dx === x && dy === y - 1),
+						w: !discovered.some(([dx, dy]) => x === 0 || dx === x - 1 && dy === y),
+					}
+
+					const shadows = [
+						unexplored.n && `inset 0 20px 20px -10px #fff1e5`,
+						unexplored.e && `inset -20px 0 20px -10px #fff1e5`,
+						unexplored.s && `inset 0 -20px 20px -10px #fff1e5`,
+						unexplored.w && `inset 20px 0 20px -10px #fff1e5`,
+					].filter(Boolean)
+
+					return <div
 						key={`${x},${y}`}
 						style={{
 							position: 'absolute',
@@ -88,8 +113,10 @@ export default ({ width, height }) => {
 							width={width}
 							height={height}
 						/>
+						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: 1, left: 0, top: 0, boxShadow: shadows.join(', ') }} />
+						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: -1, left: 0, top: 0, boxShadow: '0 0 50px 50px #fff1e5' }} />
 					</div>
-				))}
+				})}
 			</div>
 
 			<div style={{ position: 'fixed' }}>
