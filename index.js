@@ -4,7 +4,7 @@ import { Seed } from './components/use-noise'
 import Map from './components/map'
 import useLocalStorage from './components/use-local-storage'
 
-// TODO: further exploration & encounters, weather & wind, supplies, more descriptions & omens, styles, worker
+// TODO: further exploration & encounters, soundscapes, styles, weather & wind, supplies, worker
 
 const App = () => {
 	const [seedInput, setSeedInput] = useState('')
@@ -12,7 +12,7 @@ const App = () => {
 
 	return seed ? (
 		<Seed.Provider value={seed}>
-			<Map width={200} height={200} />
+			<Map width={300} height={300} />
 		</Seed.Provider>
 	) : (
 		<form
