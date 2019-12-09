@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { render } from 'react-dom'
 import Tile from './components/tile'
 import useNoise, { Seed } from './components/use-noise'
+import useLocalStorage from './components/use-local-storage'
 
 // TODO: map layout, worker, location-dependent variables, weather, prompts, localstorage & dislpay screen, fixed coasts
 
@@ -13,8 +14,10 @@ const types = [
 ]
 
 const Map = ({ width, height }) => {
-	const [current, setCurrent] = useState([0, 0])
-	const [discovered, setDiscovered] = useState([[0, 0]])
+	const [current, setCurrent] = useLocalStorage('sextantCurrent', [0, 0])
+	const [discovered, setDiscovered] = useLocalStorage('sextantDiscovered', [
+		[0, 0],
+	])
 	const noise = useNoise()
 
 	const getType = (x, y) => {
