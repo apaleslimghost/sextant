@@ -11,5 +11,16 @@ export default (key, defaultValue) => {
 		localStorage[key] = JSON.stringify(state)
 	}, [key, state])
 
+	useEffect(() => {
+		function onStorage(event) {
+			if (event.key === key) {
+				setState(JSON.parse(event.newValue))
+			}
+		}
+
+		window.addEventListener('storage', onStorage)
+		return () => window.removeEventListener('storage', onStorage)
+	}, [key])
+
 	return [state, setState]
 }
