@@ -28,6 +28,14 @@ const verbs = {
 
 const adjectives = ['rocky', 'bare', 'barren', 'jagged', 'rugged', 'irregular', 'craggy', 'bitter', 'bleak', 'desolate', 'windswept', 'foreboding', 'icy', 'frozen']
 
+const omens = [
+	'we see seagulls circling',
+	'the seas look calmer',
+	'thunderclouds gather',
+	'a silhouette on the horizon',
+
+]
+
 const getRandom = (noise, array, x, y, scale, weight = 2) => {
 	const n = (noise.gen(x / scale, y / scale) + 1) / 2
 	const g = Math.floor(n ** weight * array.length)
@@ -48,11 +56,26 @@ const Description = ({ type, x, y }) => {
 	return <><strong>{description}</strong> {verb}.</>
 }
 
+const Omen = ({ x, y, discovered }) => {
+	const noise = useNoise()
+	const unexplored = {
+		n: !discovered.some(([dx, dy]) => dx === x && dy === y + 1),
+		e: !discovered.some(([dx, dy]) => dx === x + 1 && dy === y),
+		s: !discovered.some(([dx, dy]) => y === 0 || dx === x && dy === y - 1),
+		w: !discovered.some(([dx, dy]) => x === 0 || dx === x - 1 && dy === y),
+	}
+	const omenDirections = ['west', 'south', 'north', 'east'].filter(d => unexplored[d[0]])
+	const omenDirection = getRandom(noise, omenDirections, x, y, 10)
+	const omen = getRandom(noise, omens, x, y, 3, 1)
+
+	return (noise.gen(x, y) > 0) ? <>To the {omenDirection}, <strong>{omen}</strong>.</> : null;
+}
+
 const Log = ({ discovered }) => {
 	const noise = useNoise()
 	const getType = getRandomByPos(noise, types)
 	return <ul>{discovered.slice(-5).map(([x, y], i) => <li key={i}>
-		Day {Math.ceil(3 * (i + Math.max(0, discovered.length - 5)) * ((noise.gen(x / 50, y / 50) + 2) / 2))}. <Description {...{ x, y }} type={getType(x, y)} />
+		Day {Math.ceil(3 * (i + Math.max(0, discovered.length - 5)) * ((noise.gen(x / 50, y / 50) + 2) / 2))}. <Description {...{ x, y }} type={getType(x, y)} /> <Omen {...{ x, y }} discovered={discovered.slice(0, (i + Math.max(0, discovered.length - 5)))} />
 	</li>)}</ul>
 }
 
@@ -119,12 +142,12 @@ export default ({ width, height }) => {
 				})}
 			</div>
 
-			<div style={{ position: 'fixed' }}>
+			<div style={{ position: 'fixed', zIndex: 2 }}>
 				<Log discovered={discovered} />
 			</div>
 
 			{location.hash !== '#display' &&
-				<div style={{ position: 'fixed', right: '8px' }}>
+				<div style={{ position: 'fixed', right: 0, zIndex: 2 }}>
 					<button
 						type='button'
 						disabled={current[0] === 0}

@@ -4,7 +4,7 @@ import { Seed } from './components/use-noise'
 import Map from './components/map'
 import useLocalStorage from './components/use-local-storage'
 
-// TODO: omens, further exploration, weather & wind, supplies, more descriptions, worker
+// TODO: further exploration, weather & wind, supplies, more descriptions, worker
 
 const App = () => {
 	const [seedInput, setSeedInput] = useState('')
