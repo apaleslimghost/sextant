@@ -28,9 +28,9 @@ const verbs = {
 
 const adjectives = ['rocky', 'bare', 'barren', 'jagged', 'rugged', 'irregular', 'craggy', 'bitter', 'bleak', 'desolate', 'windswept', 'foreboding', 'icy', 'frozen']
 
-const getRandom = (noise, array, x, y, scale) => {
+const getRandom = (noise, array, x, y, scale, weight = 2) => {
 	const n = (noise.gen((x % scale) / scale, (y % scale) / scale) + 1) / 2
-	const g = Math.floor(n ** 2 * array.length)
+	const g = Math.floor(n ** weight * array.length)
 	return array[g]
 }
 
@@ -41,11 +41,19 @@ const getRandomByPos = (noise, array) => (x, y) => {
 
 const Description = ({ type, x, y }) => {
 	const noise = useNoise()
-	const adjective = getRandom(noise, adjectives, x, y, 10)
-	const description = getRandom(noise, descriptions(adjective)[type], x, y, 2)
-	const verb = getRandom(noise, verbs[type], x, y, 7)
+	const adjective = getRandom(noise, adjectives, x, y, 10, 1.5)
+	const description = getRandom(noise, descriptions(adjective)[type], x, y, 2, 1)
+	const verb = getRandom(noise, verbs[type], x, y, 7, 1)
 
 	return <><strong>{description}</strong> {verb}.</>
+}
+
+const Log = ({ discovered }) => {
+	const noise = useNoise()
+	const getType = getRandomByPos(noise, types)
+	return <ul>{discovered.slice(-5).map(([x, y], i) => <li key={i}>
+		Day {Math.ceil(7 * (i + Math.max(0, discovered.length - 5)) * ((noise.gen(x / 50, y / 50) + 2) / 2))}. <Description {...{ x, y }} type={getType(x, y)} />
+	</li>)}</ul>
 }
 
 export default ({ width, height }) => {
@@ -85,7 +93,7 @@ export default ({ width, height }) => {
 			</div>
 
 			<div style={{ position: 'fixed' }}>
-				<Description x={current[0]} y={current[1]} type={getType(...current)} />
+				<Log discovered={discovered} />
 			</div>
 
 			{location.hash !== '#display' &&

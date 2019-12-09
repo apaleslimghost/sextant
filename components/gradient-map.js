@@ -1,10 +1,10 @@
 export default (imageData, gradientStops) => {
 	const gradientCanvas = document.createElement('canvas')
-	gradientCanvas.width = 255
+	gradientCanvas.width = 256
 	gradientCanvas.height = 1
 
 	const gradientCtx = gradientCanvas.getContext('2d')
-	const gradient = gradientCtx.createLinearGradient(0, 0, 255, 0)
+	const gradient = gradientCtx.createLinearGradient(0, 0, 256, 0)
 	for (const stop in gradientStops) {
 		if (Object.prototype.hasOwnProperty.call(gradientStops, stop)) {
 			gradient.addColorStop(stop, gradientStops[stop])
@@ -12,9 +12,9 @@ export default (imageData, gradientStops) => {
 	}
 
 	gradientCtx.fillStyle = gradient
-	gradientCtx.fillRect(0, 0, 255, 1)
+	gradientCtx.fillRect(0, 0, 256, 1)
 
-	const gradientData = gradientCtx.getImageData(0, 0, 255, 1).data
+	const gradientData = gradientCtx.getImageData(0, 0, 256, 1).data
 
 	const { width, height } = imageData
 
