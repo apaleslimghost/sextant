@@ -23,9 +23,20 @@ const App = () => {
 		>
 			<input
 				type='text'
-				placeholder='Seed&hellip;'
+				placeholder='The Voyage of&hellip;'
 				value={seedInput}
 				onChange={event => setSeedInput(event.target.value)}
+				style={{
+					fontSize: '2em',
+					background: 'transparent',
+					border: '0 none',
+					borderBottom: '3px solid',
+					position: 'absolute',
+					left: '50%',
+					top: '50%',
+					transform: 'translate(-50%, -50%)',
+					fontFamily: 'Palatino',
+				}}
 			/>
 		</form>
 	)

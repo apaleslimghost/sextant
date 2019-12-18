@@ -18,7 +18,7 @@ const types = [
 	['coast'],
 	['smallIslands', 'smallIslands', 'tinyIslands', 'island'],
 	['tinyIslands', 'ocean', 'smallIslands'],
-	['ocean', 'ocean', 'tinyIslands', 'smallIslands', 'island'],
+	['ocean', 'tinyIslands', 'smallIslands', 'island'],
 ]
 
 const descriptions = adj => ({
@@ -48,7 +48,7 @@ const omens = [
 	'the stars showed us the way',
 	'a current draws us',
 	'we see a large airborne creature',
-	'froth and spray from a maelstrom',
+	'froth and spray from a mælstrom',
 	'a dark shape in the depths',
 	'an albatross flies ahead of us'
 ]
@@ -108,8 +108,8 @@ const encounters = {
 	},
 }
 
-const getRandom = (noise, array, x, y, scale, weight = 2) => {
-	const n = (noise.gen(x / scale, y / scale) + 1) / 2
+const getRandom = (noise, array, x, y, scale, weight = 2, fudge = 0) => {
+	const n = (noise.gen(x / scale, y / scale) + 1) / 2 + fudge
 	const g = Math.floor(n ** weight * array.length)
 	return array[g]
 }
@@ -136,11 +136,12 @@ const Omen = ({ x, y, discovered }) => {
 		s: y !== 0 && !discovered.some(([dx, dy]) => dx === x && dy === y - 1),
 		w: x !== 0 && !discovered.some(([dx, dy]) => dx === x - 1 && dy === y),
 	}
+
 	const omenDirections = ['west', 'south', 'north', 'east'].filter(d => unexplored[d[0]])
 	const omenDirection = getRandom(noise, omenDirections, x, y, 10)
 	const omen = getRandom(noise, omens, x, y, 3, 1)
 
-	return (noise.gen(x, y) > 0.5) ? <>To the {omenDirection}, <strong>{omen}</strong>.</> : null;
+	return (noise.gen(x / 3, y / 3) > 0) ? <>To the {omenDirection}, <strong>{omen}</strong>.</> : null;
 }
 
 const Encounter = ({ x, y, current }) => {
@@ -155,13 +156,14 @@ const Encounter = ({ x, y, current }) => {
 	const encounter = getRandom(noise, Object.keys(possible), x, y, 6)
 
 	const encountered = explored.map(e => pos(...e)).includes(pos(x, y))
+	console.log(explored, x, y, encountered)
 
-	const wtf = getRandom(noise, possible[encounter], x, y, 8)
+	const wtf = getRandom(noise, possible[encounter], x, y, 8, 0.75, 0.01)
 
 	return yea ? <>
 		We see <strong>{encounter}</strong>.{' '}
 		{encountered && <>We find <strong>{wtf}</strong>.</>}
-		{current && !encountered && <button type='button' onClick={() => {
+		{current && !encountered && Boolean(possible[encounter].length) && <button type='button' onClick={() => {
 			setExplored(e => e.concat([pos(x, y)]))
 		}}>Explore?</button>}
 	</> : null;
@@ -175,13 +177,13 @@ const Log = ({ discovered }) => {
 		{hmm.map(([x, y], i) => {
 			const day = Math.floor(
 				3 * (
-					i + Math.max(0, discovered.length - 5)
+					i + Math.max(0, discovered.length - 2)
 				) * (
 					(noise.gen(x / 50, y / 50) + 2) / 2
 				)
 			) + 1
 
-			const discoveredByNow = discovered.slice(0, (i + Math.max(0, discovered.length - 5)))
+			const discoveredByNow = discovered.slice(0, (i + Math.max(0, discovered.length - 2)))
 
 			// fuk off eslint
 			// eslint-disable-next-line react/no-array-index-key
@@ -210,7 +212,7 @@ export default ({ width, height }) => {
 
 	return (
 		<>
-			<div style={{ position: 'absolute', height: `${(maxY + 1) * height}px`, minHeight: 'calc(100vh - 8em)', left: 0, top: '8em' }}>
+			<div style={{ position: 'absolute', height: `${(maxY + 1) * height}px`, minHeight: 'calc(100vh - 8em)', left: 0, top: '8em', marginRight: '8em' }}>
 				{uniqDisco.map(([x, y]) => {
 					const unexplored = {
 						n: !discovered.some(([dx, dy]) => dx === x && dy === y + 1),
@@ -242,7 +244,7 @@ export default ({ width, height }) => {
 							height={height}
 						/>
 						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: 1, left: 0, top: 0, boxShadow: shadows.join(', '), pointerEvents: 'none' }} />
-						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: -1, left: 0, top: 0, boxShadow: '0 0 50px 50px #fff1e5', pointerEvents: 'none' }} />
+						<div style={{ position: "absolute", width: '100%', height: '100%', zIndex: -1, left: 0, top: 0, boxShadow: '0 0 100px 100px #fff1e5', pointerEvents: 'none' }} />
 						{location.hash !== '#display' && pos(...current) === pos(x, y) &&
 							<div style={{ position: 'absolute', width: '100%', height: '100%', left: 0, top: 0, zIndex: 3 }}>
 								{current[0] !== 0 && <button
