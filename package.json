@@ -4,7 +4,7 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "parcel index.html",
-		"build": "NODE_ENV=production parcel build --out-dir=docs index.html",
+		"build": "NODE_ENV=production parcel build --out-dir=docs --public-url=/sextant index.html",
 		"storybook": "start-storybook -p 6006",
 		"build-storybook": "build-storybook"
 	},
